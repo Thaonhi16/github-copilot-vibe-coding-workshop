@@ -1,0 +1,351 @@
+openapi: 3.0.1
+info:
+  title: Simple Social Media Application API
+  version: 1.0.0
+  description: |
+    API for a basic Social Networking Service (SNS) that allows users to create, retrieve, update, and delete posts; add comments; and like/unlike posts. Designed for MVP and educational use.
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /posts:
+    get:
+      summary: List all posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateRequest'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid input
+  /posts/{postId}:
+    get:
+      summary: Get a single post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+    patch:
+      summary: Update a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdateRequest'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid input
+        '404':
+          description: Post not found
+    delete:
+      summary: Delete a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Post deleted
+        '404':
+          description: Post not found
+  /posts/{postId}/comments:
+    get:
+      summary: List comments for a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Post not found
+    post:
+      summary: Create a comment on a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid input
+        '404':
+          description: Post not found
+  /posts/{postId}/comments/{commentId}:
+    get:
+      summary: Get a specific comment
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Comment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          description: Comment not found
+    patch:
+      summary: Update a comment
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdateRequest'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid input
+        '404':
+          description: Comment not found
+    delete:
+      summary: Delete a comment
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Comment deleted
+        '404':
+          description: Comment not found
+  /posts/{postId}/likes:
+    post:
+      summary: Like a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequest'
+      responses:
+        '201':
+          description: Post liked
+        '400':
+          description: Invalid input
+        '404':
+          description: Post not found
+    delete:
+      summary: Unlike a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequest'
+      responses:
+        '204':
+          description: Like removed
+        '404':
+          description: Post not found
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        likes:
+          type: integer
+        comments:
+          type: integer
+      required:
+        - id
+        - username
+        - content
+        - createdAt
+        - updatedAt
+        - likes
+        - comments
+    PostCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+      required:
+        - username
+        - content
+    PostUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+      required:
+        - username
+        - content
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        postId:
+          type: string
+        username:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - postId
+        - username
+        - content
+        - createdAt
+        - updatedAt
+    CommentCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+      required:
+        - username
+        - content
+    CommentUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        content:
+          type: string
+      required:
+        - username
+        - content
+    LikeRequest:
+      type: object
+      properties:
+        username:
+          type: string
+      required:
+        - username
